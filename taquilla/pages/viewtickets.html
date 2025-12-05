@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Boletos - UrbanFest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Estilo Wallet */
+        .wallet-ticket {
+            background: linear-gradient(135deg, #1f1f22 0%, #09090b 100%);
+            border: 1px solid #3f3f46;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .wallet-ticket::before, .wallet-ticket::after {
+            content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 20px; background-color: #000000; border-radius: 50%; z-index: 10;
+        }
+        .wallet-ticket::before { top: -10px; }
+        .wallet-ticket::after { bottom: -10px; }
+        .wallet-ticket:hover { transform: translateY(-3px); border-color: #a855f7; }
+
+        /* Boleto Inactivo (Gris) */
+        .ticket-inactive {
+            background: #18181b;
+            border: 1px solid #27272a;
+            opacity: 0.7;
+        }
+        .ticket-inactive:hover { opacity: 1; border-color: #52525b; }
+        .grayscale-img { filter: grayscale(100%); opacity: 0.5; }
+
+        /* Estilo Modal */
+        .ticket-cut-line { border-top: 2px dashed #3f3f46; position: relative; margin: 20px 0; }
+        .ticket-cut-line::before, .ticket-cut-line::after { content: ''; position: absolute; top: -10px; width: 20px; height: 20px; background-color: #18181b; border-radius: 50%; }
+        .ticket-cut-line::before { left: -30px; }
+        .ticket-cut-line::after { right: -30px; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen pb-10">
+
+    <nav class="fixed w-full top-0 z-40 bg-black/90 backdrop-blur-md border-b border-gray-800 px-6 h-16 flex items-center justify-between">
+        <a href="home.html" class="text-gray-400 hover:text-white flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
+            <i class="fa-solid fa-arrow-left"></i> Volver al Panel
+        </a>
+        <span class="font-black tracking-widest text-lg">MIS ENTRADAS</span>
+        <div class="w-8"></div>
+    </nav>
+
+    <main class="pt-24 px-4 container mx-auto fade-in max-w-4xl">
+        
+        <div class="flex justify-center mb-8 gap-4">
+            <button onclick="switchTab('active')" id="tab-active" class="px-6 py-2 rounded-full font-bold bg-white text-black transition">Activos (2)</button>
+            <button onclick="switchTab('history')" id="tab-history" class="px-6 py-2 rounded-full font-bold bg-zinc-800 text-gray-400 hover:bg-zinc-700 transition">Historial</button>
+        </div>
+
+        <div id="view-active" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div onclick="openTicketModal('LOP DELLER', '20 OCT • 21:00', 'VIP • Mesa 10', 'Ticket-12345', '$5,000')" class="wallet-ticket rounded-2xl p-6 cursor-pointer hover:border-purple-500">
+                <div class="flex justify-between items-start mb-4">
+                    <div><h2 class="text-2xl font-black text-purple-500 uppercase leading-none">LOP DELLER</h2><p class="text-sm text-gray-400 font-bold mt-1">20 OCT • 21:00</p></div>
+                    <i class="fa-solid fa-qrcode text-2xl text-white"></i>
+                </div>
+                <div class="border-t-2 border-dashed border-zinc-700 my-4 relative"></div>
+                <div class="flex justify-between items-center">
+                    <div><p class="text-xs text-gray-500 uppercase font-bold">Asiento</p><p class="text-white font-bold text-lg">VIP-10</p></div>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=Ticket1" class="w-14 h-14 bg-white p-1 rounded">
+                </div>
+            </div>
+
+            <div onclick="openTicketModal('CCÑA', '15 NOV • 20:30', 'General Pista', 'Ticket-67890', '$1,200')" class="wallet-ticket rounded-2xl p-6 cursor-pointer hover:border-blue-500">
+                <div class="flex justify-between items-start mb-4">
+                    <div><h2 class="text-2xl font-black text-blue-500 uppercase leading-none">CCÑA</h2><p class="text-sm text-gray-400 font-bold mt-1">15 NOV • 20:30</p></div>
+                    <i class="fa-solid fa-qrcode text-2xl text-white"></i>
+                </div>
+                <div class="border-t-2 border-dashed border-zinc-700 my-4 relative"></div>
+                <div class="flex justify-between items-center">
+                    <div><p class="text-xs text-gray-500 uppercase font-bold">Asiento</p><p class="text-white font-bold text-lg">GENERAL</p></div>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=Ticket2" class="w-14 h-14 bg-white p-1 rounded">
+                </div>
+            </div>
+
+        </div>
+
+        <div id="view-history" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="wallet-ticket ticket-inactive rounded-2xl p-6 cursor-not-allowed">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-gray-500 uppercase leading-none line-through">ROCK FEST</h2>
+                        <p class="text-sm text-gray-600 font-bold mt-1">10 SEP • FINALIZADO</p>
+                    </div>
+                    <span class="bg-zinc-800 text-gray-500 text-xs px-2 py-1 rounded font-bold">USADO</span>
+                </div>
+                <div class="border-t-2 border-dashed border-zinc-800 my-4 relative"></div>
+                <div class="flex justify-between items-center">
+                    <div><p class="text-xs text-gray-600 uppercase font-bold">Asiento</p><p class="text-gray-500 font-bold text-lg">PISTA</p></div>
+                    <i class="fa-solid fa-check-circle text-4xl text-zinc-800"></i>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div id="ticket-modal" class="fixed inset-0 z-[80] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/90 backdrop-blur-md transition-opacity" onclick="closeTicketModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <div class="relative transform overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-700 text-left shadow-2xl transition-all w-full max-w-xs fade-in">
+                <button onclick="closeTicketModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <div class="p-6 text-center bg-[#18181b]">
+                    <h3 id="modal-event-name" class="text-2xl font-black uppercase mb-1 text-white">EVENTO</h3>
+                    <p id="modal-event-time" class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-6">FECHA</p>
+                    <div class="bg-white p-4 rounded-xl inline-block mb-4 shadow-xl"><img id="modal-qr" src="" class="w-48 h-48 mix-blend-multiply"></div>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest animate-pulse">Listo para escanear</p>
+                </div>
+                <div class="ticket-cut-line"></div>
+                <div class="px-6 pb-6">
+                    <div class="flex justify-between mb-4 text-sm">
+                        <div class="text-left"><p class="text-gray-500 text-xs uppercase">Asiento</p><p id="modal-seat" class="font-bold text-white text-lg">Zona</p></div>
+                        <div class="text-right"><p class="text-gray-500 text-xs uppercase">Costo</p><p id="modal-price" class="font-bold text-purple-400 text-lg">$0</p></div>
+                    </div>
+                    <button class="w-full bg-black border border-zinc-700 hover:bg-zinc-800 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2"><i class="fa-brands fa-apple text-xl"></i> Agregar a Wallet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TABS Lógica
+        function switchTab(tab) {
+            const btnActive = document.getElementById('tab-active');
+            const btnHistory = document.getElementById('tab-history');
+            const viewActive = document.getElementById('view-active');
+            const viewHistory = document.getElementById('view-history');
+
+            if (tab === 'active') {
+                viewActive.classList.remove('hidden');
+                viewHistory.classList.add('hidden');
+                btnActive.className = "px-6 py-2 rounded-full font-bold bg-white text-black transition";
+                btnHistory.className = "px-6 py-2 rounded-full font-bold bg-zinc-800 text-gray-400 hover:bg-zinc-700 transition";
+            } else {
+                viewActive.classList.add('hidden');
+                viewHistory.classList.remove('hidden');
+                btnActive.className = "px-6 py-2 rounded-full font-bold bg-zinc-800 text-gray-400 hover:bg-zinc-700 transition";
+                btnHistory.className = "px-6 py-2 rounded-full font-bold bg-white text-black transition";
+            }
+        }
+
+        // Modal Lógica
+        const ticketModal = document.getElementById('ticket-modal');
+        function openTicketModal(ev, ti, se, id, pr) {
+            document.getElementById('modal-event-name').innerText = ev;
+            document.getElementById('modal-event-time').innerText = ti;
+            document.getElementById('modal-seat').innerText = se;
+            document.getElementById('modal-price').innerText = pr;
+            document.getElementById('modal-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${id}`;
+            ticketModal.classList.remove('hidden');
+        }
+        function closeTicketModal() { ticketModal.classList.add('hidden'); }
+        document.addEventListener('keydown', function(e) { if(e.key === "Escape") closeTicketModal(); });
+    </script>
+</body>
+</html>

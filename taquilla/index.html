@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UrbanFest Club - Boletos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Estilos base */
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+
+        /* Marquee (Patrocinadores) */
+        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; }
+        .marquee-track { display: inline-block; animation: scroll 20s linear infinite; }
+        .marquee-item { display: inline-block; margin: 0 40px; font-weight: bold; font-size: 1.5rem; opacity: 0.5; transition: opacity 0.3s; }
+        .marquee-item:hover { opacity: 1; color: #fff; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Hover Cards */
+        .event-card:hover .event-img { transform: scale(1.1); }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        /* Scrollbar para el modal de eventos */
+        .custom-scroll::-webkit-scrollbar { width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #18181b; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #52525b; }
+    </style>
+</head>
+<body class="bg-black text-white">
+
+    <header class="fixed w-full top-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+        <div class="container mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer">
+                <img src="/img/UrbanFest-removebg-preview.png" alt="Logo" class="h-12 w-12 object-contain">
+                <span class="text-2xl font-black tracking-tighter">UrbanFest<span class="text-gray-500"> Club</span></span>
+            </div>
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium uppercase tracking-widest text-gray-400">
+                <a href="#" class="hover:text-white transition">Lenguaje <i class="fa-solid fa-globe ml-1"></i></a>
+                <a href="#" class="text-white border-b-2 border-white pb-1">Cartelera</a>
+                <a href="#" class="hover:text-white transition">Suites</a>
+                <a href="#" class="hover:text-white transition">Comunicados</a>
+                <a href="#" class="hover:text-white transition">Contacto</a>
+                <a href="#" class="hover:text-white transition">Rentas</a>
+                <button onclick="openModal('home')" class="bg-white text-black px-4 py-2 rounded-full ...">
+                    <i class="fa-regular fa-user"></i>
+                </button>
+            </nav>
+            <button class="md:hidden text-2xl text-white"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <section class="mt-20 relative h-[400px] w-full bg-cover bg-center flex items-center justify-center" style="background-image: url('/img/back\ barrio\ fino.jpg');">
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+        <div class="relative z-10 text-center px-4">
+            <h1 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter uppercase">Vive la Experiencia</h1>
+            <p class="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto">Los mejores conciertos y eventos en el recinto más moderno de la ciudad.</p>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 py-16">
+        <div class="flex items-end justify-between mb-10 border-b border-gray-800 pb-4">
+            <h2 class="text-3xl md:text-4xl font-bold uppercase">Próximos Eventos</h2>
+            <button onclick="openEventsModal()" class="text-gray-400 hover:text-white text-sm uppercase font-bold transition flex items-center gap-2">
+                Ver todo <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                <div class="h-56 overflow-hidden relative">
+                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                    <img src="/img/concert1.jpg" alt="Evento" class="event-img w-full h-full object-cover transition duration-500">
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider"><i class="fa-regular fa-clock mr-1"></i> 20 OCT • 21:00 HRS</p>
+                    <h3 class="text-2xl font-black text-white mb-1 uppercase">LOP DELLER</h3>
+                    <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition uppercase tracking-widest text-sm">Comprar Boletos</button>
+                </div>
+            </div>
+
+            <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                <div class="h-56 overflow-hidden relative">
+                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                    <img src="/img/concert2.jpg" alt="Evento" class="event-img w-full h-full object-cover transition duration-500">
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider"><i class="fa-regular fa-clock mr-1"></i> 15 NOV • 20:30 HRS</p>
+                    <h3 class="text-2xl font-black text-white mb-1 uppercase">CCÑA</h3>
+                    <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>
+                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition uppercase tracking-widest text-sm">Comprar Boletos</button>
+                </div>
+            </div>
+
+            <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                <div class="h-56 overflow-hidden relative">
+                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                    <img src="/img/concert4.jpg" alt="Evento" class="event-img w-full h-full object-cover transition duration-500">
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider"><i class="fa-regular fa-clock mr-1"></i> 05 DIC • 19:00 HRS</p>
+                    <h3 class="text-2xl font-black text-white mb-1 uppercase">Yardenitt</h3>
+                    <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition uppercase tracking-widest text-sm">Comprar Boletos</button>
+                </div>
+            </div>
+
+            <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                <div class="h-56 overflow-hidden relative">
+                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                    <img src="/img/concert5.jpg" alt="Evento" class="event-img w-full h-full object-cover transition duration-500">
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider"><i class="fa-regular fa-clock mr-1"></i> 10 DIC • 21:00 HRS</p>
+                    <h3 class="text-2xl font-black text-white mb-1 uppercase">Mizil</h3>
+                    <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition uppercase tracking-widest text-sm">Comprar Boletos</button>
+                </div>
+            </div>
+
+            <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                <div class="h-56 overflow-hidden relative">
+                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                    <img src="/img/concert6.jpg" alt="Evento" class="event-img w-full h-full object-cover transition duration-500">
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider"><i class="fa-regular fa-clock mr-1"></i> 12 ENE • 20:00 HRS</p>
+                    <h3 class="text-2xl font-black text-white mb-1 uppercase">Don alberici</h3>
+                    <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition uppercase tracking-widest text-sm">Comprar Boletos</button>
+                </div>
+            </div>
+
+            <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                <div class="h-56 overflow-hidden relative">
+                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                    <img src="/img/concert7.jpeg" alt="Evento" class="event-img w-full h-full object-cover transition duration-500">
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider"><i class="fa-regular fa-clock mr-1"></i> 14 FEB • 18:00 HRS</p>
+                    <h3 class="text-2xl font-black text-white mb-1 uppercase">Sound Control</h3>
+                    <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition uppercase tracking-widest text-sm">Comprar Boletos</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 bg-white text-black border-t border-gray-200">
+        <div class="container mx-auto px-6 mb-6">
+            <h3 class="text-center font-bold text-gray-500 tracking-widest uppercase text-sm">Nuestros Patrocinadores</h3>
+        </div>
+        <div class="marquee-container text-black">
+            <div class="marquee-track text-4xl font-black uppercase text-gray-400">
+                <span class="marquee-item text-black">Coca-Cola</span>
+                <span class="marquee-item text-black">Heineken</span>
+                <span class="marquee-item text-black">Banamex</span>
+                <span class="marquee-item text-black">Telcel</span>
+                <span class="marquee-item text-black">Samsung</span>
+                <span class="marquee-item text-black">Aeroméxico</span>
+                <span class="marquee-item text-black">Uber</span>
+                <span class="marquee-item text-black">Visa</span>
+                <span class="marquee-item text-black">Coca-Cola</span>
+                <span class="marquee-item text-black">Heineken</span>
+                <span class="marquee-item text-black">Banamex</span>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-zinc-900 text-gray-400 pt-16 pb-8 border-t border-gray-800">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            <div>
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <img src="/img/UrbanFest-removebg-preview.png" alt="Logo" class="h-12 w-12 object-contain">
+                    <span class="text-2xl font-black tracking-tighter">UrbanFest<span class="text-gray-500"> Club</span></span>
+                </div>
+                <p class="mb-6 text-sm mt-4">Conectando a los fans con sus artistas favoritos.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-white hover:text-black transition"><i class="fa-brands fa-tiktok"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold uppercase mb-4 tracking-widest">Legal</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Términos de Compra</a></li>
+                    <li><a href="#" class="hover:text-white transition">Políticas de Privacidad</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold uppercase mb-4 tracking-widest">Atención</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><i class="fa-solid fa-phone mr-2"></i> +52 (33) 1234 5678</li>
+                    <li><i class="fa-solid fa-envelope mr-2"></i> contacto@UrbanFest.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-8 text-center text-xs">
+            <p>&copy; 2025 Barrio Fino Club. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+
+    <div id="events-modal" class="fixed inset-0 z-[70] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity" onclick="closeEventsModal()"></div>
+        <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center">
+                <div class="relative transform overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-700 text-left shadow-2xl transition-all w-full max-w-6xl fade-in flex flex-col max-h-[90vh]">
+                    
+                    <div class="p-6 border-b border-zinc-700 flex flex-col md:flex-row justify-between items-center gap-4 bg-zinc-900 z-10">
+                        <h2 class="text-2xl font-bold uppercase text-white">Todos los Eventos</h2>
+                        <div class="flex gap-4 w-full md:w-auto">
+                            <div class="relative w-full md:w-64">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-500"></i>
+                                <input type="text" id="eventSearch" onkeyup="filterEvents()" placeholder="Buscar artista..." class="w-full bg-black border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-white transition">
+                            </div>
+                            <div class="relative w-full md:w-auto">
+                                <input type="date" id="eventDate" onchange="filterEvents()" class="w-full bg-black border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white transition [color-scheme:dark]">
+                            </div>
+                        </div>
+                        <button onclick="closeEventsModal()" class="absolute top-4 right-4 md:static text-gray-400 hover:text-white transition bg-zinc-800 hover:bg-zinc-700 w-8 h-8 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="p-8 overflow-y-auto custom-scroll bg-black/50">
+                        <div id="events-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            
+                            <div class="event-item event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300" data-date="2025-10-20">
+                                <div class="h-48 overflow-hidden relative">
+                                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                                    <img src="/img/concert1.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                                </div>
+                                <div class="p-5">
+                                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">20 OCT • 21:00 HRS</p>
+                                    <h3 class="event-title text-xl font-black text-white mb-1 uppercase">LOP DELLER</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UrbanFest Club</p>
+                                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                                </div>
+                            </div>
+
+                            <div class="event-item event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300" data-date="2025-11-15">
+                                <div class="h-48 overflow-hidden relative">
+                                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                                    <img src="/img/concert2.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                                </div>
+                                <div class="p-5">
+                                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">15 NOV • 20:30 HRS</p>
+                                    <h3 class="event-title text-xl font-black text-white mb-1 uppercase">CCÑA</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UrbanFest Club</p>
+                                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                                </div>
+                            </div>
+
+                            <div class="event-item event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300" data-date="2025-12-05">
+                                <div class="h-48 overflow-hidden relative">
+                                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                                    <img src="/img/concert4.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                                </div>
+                                <div class="p-5">
+                                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">05 DIC • 19:00 HRS</p>
+                                    <h3 class="event-title text-xl font-black text-white mb-1 uppercase">Yardenitt</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UrbanFest Club</p>
+                                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                                </div>
+                            </div>
+
+                            <div class="event-item event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300" data-date="2025-12-10">
+                                <div class="h-48 overflow-hidden relative">
+                                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                                    <img src="/img/concert5.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                                </div>
+                                <div class="p-5">
+                                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">10 DIC • 21:00 HRS</p>
+                                    <h3 class="event-title text-xl font-black text-white mb-1 uppercase">Mizil</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UrbanFest Club</p>
+                                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                                </div>
+                            </div>
+
+                            <div class="event-item event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300" data-date="2026-01-12">
+                                <div class="h-48 overflow-hidden relative">
+                                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                                    <img src="/img/concert6.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                                </div>
+                                <div class="p-5">
+                                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">12 ENE • 20:00 HRS</p>
+                                    <h3 class="event-title text-xl font-black text-white mb-1 uppercase">Don alberici</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UrbanFest Club</p>
+                                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                                </div>
+                            </div>
+
+                            <div class="event-item event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300" data-date="2026-02-14">
+                                <div class="h-48 overflow-hidden relative">
+                                    <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                                    <img src="/img/concert7.jpeg" class="event-img w-full h-full object-cover transition duration-500">
+                                </div>
+                                <div class="p-5">
+                                    <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">14 FEB • 18:00 HRS</p>
+                                    <h3 class="event-title text-xl font-black text-white mb-1 uppercase">Sound Control</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UrbanFest Club</p>
+                                    <button onclick="openModal('checkout')" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="no-results" class="hidden text-center py-10 text-gray-500">
+                            <i class="fa-solid fa-ghost text-4xl mb-3"></i>
+                            <p>No se encontraron eventos con esos filtros.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="auth-modal" class="fixed inset-0 z-[80] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-700 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md fade-in">
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <div class="px-8 py-8">
+                    <div id="login-view">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-white mb-2">Bienvenido de nuevo</h3>
+                            <p class="text-sm text-gray-400">Ingresa a tu cuenta para comprar boletos</p>
+                        </div>
+                        <form class="space-y-4" action="seleccion.html">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Correo Electrónico</label>
+                                <input type="email" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition" placeholder="tu@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contraseña</label>
+                                <input type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition" placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition transform active:scale-95">INICIAR SESIÓN</button>
+                        </form>
+                        <div class="relative my-6">
+                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-700"></div></div>
+                            <div class="relative flex justify-center"><span class="bg-zinc-900 px-2 text-xs text-gray-500 uppercase">O continúa con</span></div>
+                        </div>
+                        <button class="w-full border border-gray-600 hover:bg-gray-800 text-white font-medium py-3 rounded-lg transition flex items-center justify-center gap-3">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="h-5 w-5" alt="Google"> Google
+                        </button>
+                        <p class="mt-6 text-center text-sm text-gray-400">¿No tienes cuenta? <button onclick="toggleAuth('register')" class="text-white font-bold hover:underline">Regístrate</button></p>
+                    </div>
+                    <div id="register-view" class="hidden">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-white mb-2">Crear Cuenta</h3>
+                            <p class="text-sm text-gray-400">Únete a Barrio Fino Club</p>
+                        </div>
+                        <form class="space-y-4" action="seleccion.html">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre</label>
+                                    <input type="text" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Apellido</label>
+                                    <input type="text" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Correo Electrónico</label>
+                                <input type="email" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contraseña</label>
+                                <input type="password" class="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition">
+                            </div>
+                            <button type="submit" class="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition transform active:scale-95">REGISTRARME</button>
+                        </form>
+                        <p class="mt-6 text-center text-sm text-gray-400">¿Ya tienes cuenta? <button onclick="toggleAuth('login')" class="text-white font-bold hover:underline">Inicia Sesión</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AUTH MODAL ---
+        const authModal = document.getElementById('auth-modal');
+        const loginView = document.getElementById('login-view');
+        const registerView = document.getElementById('register-view');
+
+        // ACEPTA UN PARÁMETRO 'dest' (destino)
+        function openModal(dest) {
+            // Cerramos el modal de eventos si está abierto
+            if(typeof closeEventsModal === 'function') closeEventsModal();
+            
+            authModal.classList.remove('hidden');
+            toggleAuth('login');
+
+            // LÓGICA DE REDIRECCIÓN DINÁMICA
+            const forms = authModal.querySelectorAll('form');
+            let targetUrl = '';
+
+            if (dest === 'home') {
+                targetUrl = 'pages/home.html'; // Si viene del header
+            } else {
+                targetUrl = 'pages/seleccion.html'; // Si viene de comprar
+            }
+
+            // Actualizamos el 'action' de todos los formularios (Login y Registro)
+            forms.forEach(form => {
+                form.action = targetUrl;
+            });
+        }
+
+        function closeModal() {
+            authModal.classList.add('hidden');
+        }
+
+        function toggleAuth(view) {
+            if (view === 'register') {
+                loginView.classList.add('hidden');
+                registerView.classList.remove('hidden');
+            } else {
+                registerView.classList.add('hidden');
+                loginView.classList.remove('hidden');
+            }
+        }
+
+        // --- EVENTS MODAL & FILTER ---
+        const eventsModal = document.getElementById('events-modal');
+
+        function openEventsModal() {
+            eventsModal.classList.remove('hidden');
+            document.getElementById('eventSearch').value = '';
+            document.getElementById('eventDate').value = '';
+            filterEvents();
+        }
+
+        function closeEventsModal() {
+            eventsModal.classList.add('hidden');
+        }
+
+        function filterEvents() {
+            const searchText = document.getElementById('eventSearch').value.toLowerCase();
+            const searchDate = document.getElementById('eventDate').value; 
+            
+            const eventCards = document.querySelectorAll('#events-grid-container .event-item');
+            let visibleCount = 0;
+
+            eventCards.forEach(card => {
+                const title = card.querySelector('.event-title').innerText.toLowerCase();
+                const cardDate = card.getAttribute('data-date');
+                
+                const matchesText = title.includes(searchText);
+                const matchesDate = searchDate === '' || cardDate === searchDate;
+
+                if (matchesText && matchesDate) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            const noResults = document.getElementById('no-results');
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                closeModal();
+                closeEventsModal();
+            }
+        });
+    </script>
+</body>
+</html>

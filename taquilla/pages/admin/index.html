@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - UrbanFest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #ffffff; }
+        
+        /* Animaciones */
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Estilos de Formulario */
+        .input-dark {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .input-dark:focus { outline: none; border-color: #a855f7; ring: 2px solid rgba(168, 85, 247, 0.2); }
+
+        /* Sidebar Link Activo */
+        .nav-link.active { background-color: #a855f7; color: white; }
+        .nav-link:hover:not(.active) { background-color: #27272a; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-black border-r border-zinc-800 flex-col hidden md:flex">
+        <div class="h-16 flex items-center px-6 border-b border-zinc-800">
+            <i class="fa-solid fa-lock text-purple-500 mr-2"></i>
+            <span class="font-bold text-lg tracking-wider">ADMIN<span class="text-gray-500">PANEL</span></span>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <button onclick="showSection('dashboard')" id="nav-dashboard" class="nav-link active w-full flex items-center px-4 py-3 rounded-lg transition text-sm font-medium">
+                <i class="fa-solid fa-chart-line w-6"></i> Dashboard
+            </button>
+            <button onclick="showSection('events')" id="nav-events" class="nav-link w-full flex items-center px-4 py-3 rounded-lg transition text-sm font-medium text-gray-400">
+                <i class="fa-solid fa-calendar-days w-6"></i> Eventos
+            </button>
+            <button onclick="showSection('venues')" id="nav-venues" class="nav-link w-full flex items-center px-4 py-3 rounded-lg transition text-sm font-medium text-gray-400">
+                <i class="fa-solid fa-map w-6"></i> Recintos (Mapas)
+            </button>
+            <button onclick="showSection('sales')" id="nav-sales" class="nav-link w-full flex items-center px-4 py-3 rounded-lg transition text-sm font-medium text-gray-400">
+                <i class="fa-solid fa-ticket w-6"></i> Ventas
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-zinc-800">
+            <button class="w-full flex items-center px-4 py-2 text-red-400 hover:bg-zinc-900 rounded-lg transition text-sm">
+                <i class="fa-solid fa-right-from-bracket w-6"></i> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-[#09090b]">
+        
+        <header class="h-16 bg-black/50 backdrop-blur border-b border-zinc-800 flex justify-between items-center px-6">
+            <h2 id="page-title" class="text-xl font-bold">Resumen General</h2>
+            <div class="flex items-center gap-4">
+                <button class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold">Admin Master</p>
+                        <p class="text-xs text-gray-500">Gerente</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center font-bold">AM</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 relative">
+
+            <div id="view-dashboard" class="fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Ingresos Totales</p>
+                                <h3 class="text-3xl font-black">$124,500</h3>
+                            </div>
+                            <div class="p-3 bg-green-500/10 rounded-lg text-green-500"><i class="fa-solid fa-dollar-sign"></i></div>
+                        </div>
+                        <p class="text-xs text-green-500 mt-4 flex items-center"><i class="fa-solid fa-arrow-up mr-1"></i> +12% vs mes pasado</p>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Boletos Vendidos</p>
+                                <h3 class="text-3xl font-black">842</h3>
+                            </div>
+                            <div class="p-3 bg-purple-500/10 rounded-lg text-purple-500"><i class="fa-solid fa-ticket"></i></div>
+                        </div>
+                        <p class="text-xs text-purple-500 mt-4">4 eventos activos</p>
+                    </div>
+                    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Próximo Evento</p>
+                                <h3 class="text-xl font-bold truncate">LOP DELLER</h3>
+                                <p class="text-sm text-gray-500">20 OCT - 95% Sold Out</p>
+                            </div>
+                            <div class="p-3 bg-blue-500/10 rounded-lg text-blue-500"><i class="fa-solid fa-calendar"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl h-80">
+                    <h3 class="font-bold mb-4">Ventas de la Semana</h3>
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+
+            <div id="view-events" class="hidden fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">Listado de Eventos</h3>
+                    <button onclick="openCreateModal()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Crear Nuevo
+                    </button>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-zinc-800 text-gray-400 text-xs uppercase">
+                            <tr>
+                                <th class="p-4">Evento</th>
+                                <th class="p-4">Fecha</th>
+                                <th class="p-4">Recinto (Modelo)</th>
+                                <th class="p-4">Estado</th>
+                                <th class="p-4 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-800 text-sm">
+                            <tr class="hover:bg-zinc-800/50 transition">
+                                <td class="p-4 font-bold flex items-center gap-3">
+                                    <img src="img/concert1.jpg" class="w-10 h-10 rounded object-cover">
+                                    LOP DELLER
+                                </td>
+                                <td class="p-4 text-gray-300">20 Oct, 2025</td>
+                                <td class="p-4"><span class="bg-zinc-800 px-2 py-1 rounded text-xs border border-zinc-700">Club Principal</span></td>
+                                <td class="p-4"><span class="text-green-400 font-bold text-xs bg-green-400/10 px-2 py-1 rounded-full">Activo</span></td>
+                                <td class="p-4 text-right space-x-2">
+                                    <button class="text-gray-400 hover:text-white"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-zinc-800/50 transition">
+                                <td class="p-4 font-bold flex items-center gap-3">
+                                    <img src="img/concert2.jpg" class="w-10 h-10 rounded object-cover">
+                                    CCÑA
+                                </td>
+                                <td class="p-4 text-gray-300">15 Nov, 2025</td>
+                                <td class="p-4"><span class="bg-zinc-800 px-2 py-1 rounded text-xs border border-zinc-700">Terraza VIP</span></td>
+                                <td class="p-4"><span class="text-blue-400 font-bold text-xs bg-blue-400/10 px-2 py-1 rounded-full">Borrador</span></td>
+                                <td class="p-4 text-right space-x-2">
+                                    <button class="text-gray-400 hover:text-white"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-venues" class="hidden fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold">Modelos de Recintos</h3>
+                        <p class="text-gray-400 text-sm">Define las zonas y capacidades de tus lugares.</p>
+                    </div>
+                    <button onclick="openBuilder()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Crear Recinto
+                    </button>
+                </div>
+
+                <div id="venues-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden group hover:border-purple-500 transition relative">
+                        <button onclick="deleteCard(this)" class="absolute top-2 right-2 text-zinc-500 hover:text-red-500 bg-black/50 hover:bg-black rounded p-1 transition"><i class="fa-solid fa-trash"></i></button>
+                        <div class="h-40 bg-zinc-800 relative flex items-center justify-center">
+                            <i class="fa-solid fa-layer-group text-4xl text-gray-600"></i>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="font-bold text-lg">Club Principal</h4>
+                            <p class="text-xs text-gray-500 mt-1">Capacidad: 500 Pax</p>
+                            <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                                <span class="bg-zinc-800 px-2 py-1 rounded border border-zinc-700">VIP (50)</span>
+                                <span class="bg-zinc-800 px-2 py-1 rounded border border-zinc-700">General (400)</span>
+                                <span class="bg-zinc-800 px-2 py-1 rounded border border-zinc-700">Palco (50)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden group hover:border-blue-500 transition relative">
+                        <button onclick="deleteCard(this)" class="absolute top-2 right-2 text-zinc-500 hover:text-red-500 bg-black/50 hover:bg-black rounded p-1 transition"><i class="fa-solid fa-trash"></i></button>
+                        <div class="h-40 bg-zinc-800 relative flex items-center justify-center">
+                            <i class="fa-solid fa-wine-glass text-4xl text-gray-600"></i>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="font-bold text-lg">Terraza Lounge</h4>
+                            <p class="text-xs text-gray-500 mt-1">Capacidad: 150 Pax</p>
+                            <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                                <span class="bg-zinc-800 px-2 py-1 rounded border border-zinc-700">Mesas (30)</span>
+                                <span class="bg-zinc-800 px-2 py-1 rounded border border-zinc-700">Barra (120)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="create-event-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-700 w-full max-w-2xl rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            
+            <div class="p-6 border-b border-zinc-800 flex justify-between items-center sticky top-0 bg-zinc-900 z-10">
+                <h3 class="text-xl font-bold text-white">Nuevo Evento</h3>
+                <button onclick="closeCreateModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <form class="p-6 space-y-6" onsubmit="saveEvent(event)">
+                
+                <div class="space-y-4">
+                    <h4 class="text-purple-400 text-sm font-bold uppercase tracking-wider">Detalles Generales</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Nombre del Evento</label>
+                            <input type="text" placeholder="Ej. Neon Party" class="input-dark" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Artista / DJ</label>
+                            <input type="text" placeholder="Ej. DJ Tiesto" class="input-dark" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Fecha</label>
+                            <input type="date" class="input-dark [color-scheme:dark]" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Hora</label>
+                            <input type="time" class="input-dark [color-scheme:dark]" required>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-zinc-800">
+
+                <div class="space-y-4">
+                    <h4 class="text-purple-400 text-sm font-bold uppercase tracking-wider">Configuración de Boletos</h4>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-2">Selecciona el Modelo de Recinto</label>
+                        <select id="venue-select" onchange="updateTicketConfig()" class="input-dark cursor-pointer">
+                            <option value="">-- Selecciona una distribución --</option>
+                            <option value="club">Club Principal (Plano Original)</option>
+                            <option value="terraza">Terraza (Solo Mesas)</option>
+                            <option value="auditorio">Auditorio (Asientos Numerados)</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-2 italic">* Esto cargará automáticamente las zonas disponibles.</p>
+                    </div>
+
+                    <div id="ticket-config-area" class="hidden bg-black rounded-lg p-4 border border-zinc-800">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-gray-500 border-b border-zinc-800">
+                                <tr>
+                                    <th class="pb-2">Zona Detectada</th>
+                                    <th class="pb-2">Aforo</th>
+                                    <th class="pb-2">Precio (MXN)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticket-rows" class="divide-y divide-zinc-800">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3 justify-end">
+                    <button type="button" onclick="closeCreateModal()" class="px-6 py-2 rounded-lg border border-zinc-700 hover:bg-zinc-800 transition">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-white text-black font-bold hover:bg-gray-200 transition">Publicar Evento</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white px-6 py-3 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Evento publicado correctamente</span>
+    </div>
+
+    <div id="create-venue-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-700 w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            
+            <div class="p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900 sticky top-0">
+                <h3 class="text-xl font-bold text-white">Diseñar Nuevo Recinto</h3>
+                <button onclick="closeVenueModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <form class="p-6 space-y-6" onsubmit="saveVenue(event)">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Nombre del Lugar</label>
+                    <input type="text" id="venue-name" placeholder="Ej. Sala de Conciertos B" class="input-dark" required>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-xs font-bold text-gray-500">Configuración de Zonas</label>
+                        <button type="button" onclick="addZoneInput()" class="text-xs text-purple-400 hover:text-white font-bold transition">+ Agregar Zona</button>
+                    </div>
+                    
+                    <div class="bg-black border border-zinc-800 rounded-lg p-4">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-gray-500 text-xs uppercase">
+                                <tr>
+                                    <th class="pb-2">Nombre Zona</th>
+                                    <th class="pb-2 w-24">Capacidad</th>
+                                    <th class="pb-2 w-8"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="zones-list" class="divide-y divide-zinc-800">
+                                <tr>
+                                    <td class="py-2 pr-2"><input type="text" placeholder="Ej. General" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:border-purple-500 outline-none zone-name" required></td>
+                                    <td class="py-2 pr-2"><input type="number" placeholder="0" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:border-purple-500 outline-none zone-cap" required></td>
+                                    <td class="py-2 text-center"><button type="button" onclick="removeZone(this)" class="text-zinc-600 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 text-right">Capacidad Total: <span id="total-cap-display" class="text-white font-bold">0</span> Pax</p>
+                </div>
+
+                <div class="pt-2 flex gap-3 justify-end">
+                    <button type="button" onclick="closeVenueModal()" class="px-6 py-2 rounded-lg border border-zinc-700 hover:bg-zinc-800 transition">Cancelar</button>
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-white text-black font-bold hover:bg-gray-200 transition">Guardar Recinto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="visual-builder-modal" class="fixed inset-0 z-[60] hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-700 w-full max-w-6xl h-[95vh] rounded-2xl shadow-2xl flex flex-col">
+            
+            <div class="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900 rounded-t-2xl">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-layer-group mr-2 text-purple-500"></i>Architect Mode</h3>
+                    
+                    <div class="flex bg-black rounded-lg p-1 border border-zinc-700">
+                        <button onclick="switchLayer(0)" id="layer-btn-0" class="px-4 py-1 rounded text-xs font-bold bg-zinc-800 text-white transition">Piso 1 (Pista)</button>
+                        <button onclick="switchLayer(1)" id="layer-btn-1" class="px-4 py-1 rounded text-xs font-bold text-gray-400 hover:text-white transition">Piso 2 (Balcón)</button>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <input type="text" id="map-name" placeholder="Nombre (ej. Arena 360)" class="bg-black border border-zinc-700 text-white px-3 py-1 rounded text-sm outline-none w-48">
+                    <button onclick="saveDesignedMap()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-1 rounded text-xs font-bold transition">Guardar</button>
+                    <button onclick="closeBuilder()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+                </div>
+            </div>
+
+            <div class="flex flex-1 overflow-hidden">
+                
+                <div class="w-64 bg-black border-r border-zinc-800 p-4 flex flex-col gap-4 overflow-y-auto">
+                    
+                    <div class="bg-zinc-900 p-3 rounded border border-zinc-800">
+                        <h4 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Tamaño del Lienzo</h4>
+                        <div class="flex gap-2 mb-2">
+                            <input type="number" id="grid-size" value="20" class="w-full bg-black border border-zinc-700 rounded p-1 text-white text-xs text-center" placeholder="20x20">
+                        </div>
+                        <button onclick="initLayers()" class="w-full bg-zinc-700 hover:bg-zinc-600 text-white text-[10px] py-1 rounded">Resetear Grid</button>
+                    </div>
+
+                    <div>
+                        <h4 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Elementos</h4>
+                        <div class="space-y-1">
+                            <button onclick="selectTool('stage')" id="btn-stage" class="tool-btn w-full flex items-center p-2 rounded border border-zinc-800 hover:bg-zinc-800 transition">
+                                <div class="w-5 h-5 bg-gray-200 text-black flex items-center justify-center font-bold text-[8px] rounded mr-2">ST</div>
+                                <span class="text-xs">Escenario / Tarima</span>
+                            </button>
+
+                            <button onclick="selectTool('table-round')" id="btn-table-round" class="tool-btn w-full flex items-center p-2 rounded border border-zinc-800 hover:bg-zinc-800 transition">
+                                <div class="w-5 h-5 bg-yellow-500 rounded-full mr-2"></div>
+                                <span class="text-xs">Mesa Redonda (4pax)</span>
+                            </button>
+
+                            <button onclick="selectTool('table-rect')" id="btn-table-rect" class="tool-btn w-full flex items-center p-2 rounded border border-zinc-800 hover:bg-zinc-800 transition">
+                                <div class="w-5 h-5 bg-purple-500 rounded-sm mr-2"></div>
+                                <span class="text-xs">Sala Lounge VIP</span>
+                            </button>
+
+                            <button onclick="selectTool('general')" id="btn-general" class="tool-btn w-full flex items-center p-2 rounded border border-zinc-800 hover:bg-zinc-800 transition">
+                                <div class="w-5 h-5 bg-blue-500/20 border border-blue-500 rounded mr-2"></div>
+                                <span class="text-xs">Zona General (De pie)</span>
+                            </button>
+
+                            <button onclick="selectTool('eraser')" id="btn-eraser" class="tool-btn w-full flex items-center p-2 rounded border border-zinc-800 hover:bg-zinc-800 transition">
+                                <i class="fa-solid fa-eraser text-zinc-500 mr-3 ml-1"></i>
+                                <span class="text-xs">Borrador / Vacío</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-[#121214] overflow-auto p-10 flex items-center justify-center relative">
+                    
+                    <div class="relative shadow-2xl border border-zinc-800 bg-black" id="canvas-container">
+                        <div id="layer-0" class="grid gap-[1px] absolute top-0 left-0 z-10 transition-opacity duration-300"></div>
+                        
+                        <div id="layer-1" class="grid gap-[1px] absolute top-0 left-0 z-20 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- LÓGICA DEL CONSTRUCTOR AVANZADO ---
+        const builderModal = document.getElementById('visual-builder-modal');
+        const container = document.getElementById('canvas-container');
+        let currentTool = 'table-round';
+        let activeLayer = 0; // 0 = Pista, 1 = Balcón
+        let isDrawing = false;
+
+        function openBuilder() {
+            builderModal.classList.remove('hidden');
+            initLayers(); // Inicializar grid al abrir
+        }
+
+        function closeBuilder() {
+            builderModal.classList.add('hidden');
+        }
+
+        // 1. Inicializar Grid (Crea 2 capas superpuestas)
+        function initLayers() {
+            const size = parseInt(document.getElementById('grid-size').value) || 20;
+            const cellSize = 30; // px
+
+            // Ajustar tamaño del contenedor
+            container.style.width = `${size * (cellSize + 1)}px`;
+            container.style.height = `${size * (cellSize + 1)}px`;
+
+            // Generar Capas
+            [0, 1].forEach(layerIndex => {
+                const layerEl = document.getElementById(`layer-${layerIndex}`);
+                layerEl.innerHTML = '';
+                layerEl.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
+                layerEl.style.gridTemplateRows = `repeat(${size}, ${cellSize}px)`;
+                
+                for (let i = 0; i < size * size; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'w-full h-full border border-zinc-800/30 hover:bg-white/10 transition-colors cursor-crosshair';
+                    cell.dataset.type = 'empty';
+                    
+                    // Eventos de Mouse para pintar arrastrando
+                    cell.addEventListener('mousedown', () => { isDrawing = true; paintCell(cell); });
+                    cell.addEventListener('mouseenter', () => { if(isDrawing) paintCell(cell); });
+                    cell.addEventListener('mouseup', () => { isDrawing = false; });
+
+                    layerEl.appendChild(cell);
+                }
+            });
+
+            // Resetear vista a capa 0
+            switchLayer(0);
+        }
+
+        // Stop drawing on mouse up anywhere
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        // 2. Cambiar de Piso (Pestañas)
+        function switchLayer(layerIndex) {
+            activeLayer = layerIndex;
+            
+            const layer0 = document.getElementById('layer-0');
+            const layer1 = document.getElementById('layer-1');
+            const btn0 = document.getElementById('layer-btn-0');
+            const btn1 = document.getElementById('layer-btn-1');
+
+            if (layerIndex === 0) {
+                // Editando Piso 1
+                layer0.classList.remove('opacity-50', 'pointer-events-none');
+                layer0.classList.add('opacity-100', 'z-20'); // Traer al frente
+                
+                layer1.classList.add('opacity-20', 'pointer-events-none', 'z-10'); // Ocultar balcón (o hacerlo muy transparente)
+                
+                // Estilos botones
+                btn0.className = "px-4 py-1 rounded text-xs font-bold bg-zinc-800 text-white transition";
+                btn1.className = "px-4 py-1 rounded text-xs font-bold text-gray-400 hover:text-white transition";
+            } else {
+                // Editando Piso 2 (Balcón)
+                // Piso 1 se vuelve "Fantasma" (Ghost view) para referencia
+                layer0.classList.add('opacity-40', 'pointer-events-none', 'z-10');
+                layer0.classList.remove('z-20');
+
+                layer1.classList.remove('opacity-0', 'opacity-20', 'pointer-events-none');
+                layer1.classList.add('opacity-100', 'z-20'); // Traer al frente
+
+                // Estilos botones
+                btn1.className = "px-4 py-1 rounded text-xs font-bold bg-purple-900 text-white transition";
+                btn0.className = "px-4 py-1 rounded text-xs font-bold text-gray-400 hover:text-white transition";
+            }
+        }
+
+        // 3. Selección de Herramienta
+        function selectTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('border-purple-500', 'bg-zinc-800'));
+            document.getElementById('btn-' + tool).classList.add('border-purple-500', 'bg-zinc-800');
+        }
+
+        // 4. Pintar Celda (Lógica de Formas)
+        function paintCell(cell) {
+            // Limpiar estilos previos pero mantener borde base
+            cell.className = 'w-full h-full border border-zinc-800/30 cursor-crosshair';
+            cell.innerHTML = ''; // Quitar iconos previos
+
+            if (currentTool === 'table-round') {
+                cell.classList.add('flex', 'items-center', 'justify-center');
+                cell.innerHTML = '<div class="w-[80%] h-[80%] bg-yellow-500 rounded-full shadow-lg border border-yellow-300"></div>';
+                cell.dataset.type = 'vip';
+            } 
+            else if (currentTool === 'table-rect') {
+                cell.classList.add('bg-purple-600', 'border-purple-400', 'shadow-inner');
+                cell.dataset.type = 'lounge';
+            } 
+            else if (currentTool === 'general') {
+                cell.classList.add('bg-blue-500/30', 'border-blue-500/50');
+                cell.dataset.type = 'general';
+            }
+            else if (currentTool === 'stage') {
+                cell.classList.add('bg-white', 'text-black', 'font-bold', 'text-[8px]', 'flex', 'items-center', 'justify-center');
+                cell.innerText = 'ST';
+                cell.dataset.type = 'stage';
+            }
+            else { // Eraser
+                cell.dataset.type = 'empty';
+            }
+        }
+
+
+        function saveDesignedMap() {
+            // 1. Obtener referencias del DOM (CORRECCIÓN AQUÍ)
+            const nameInput = document.getElementById('map-name');
+            const sizeInput = document.getElementById('grid-size'); // Este es el ID correcto del HTML avanzado
+
+            // Valores por defecto para evitar errores
+            const name = nameInput ? nameInput.value : "Nuevo Recinto";
+            const size = sizeInput ? parseInt(sizeInput.value) : 20; 
+            
+            // En el modo avanzado usamos un grid cuadrado, así que filas = columnas
+            const rows = size;
+            const cols = size;
+
+            // 2. Preparamos el objeto de datos
+            const mapData = {
+                name: name,
+                capacity: 0,
+                dimensions: { rows: rows, cols: cols },
+                layers: []
+            };
+
+            let totalCapacity = 0;
+
+            // 3. Escaneamos las capas (0 y 1)
+            [0, 1].forEach(layerId => {
+                const layerEl = document.getElementById(`layer-${layerId}`);
+                
+                // Verificación de seguridad por si la capa no se inicializó
+                if (!layerEl) return;
+
+                const cells = layerEl.children;
+                const activeCells = [];
+
+                Array.from(cells).forEach((cell, index) => {
+                    const type = cell.dataset.type;
+                    
+                    // Si la celda tiene un tipo y no es 'empty'
+                    if (type && type !== 'empty') {
+                        const x = index % cols; 
+                        const y = Math.floor(index / cols);
+
+                        // Lógica de precios base
+                        let price = 0;
+                        if(type === 'vip') price = 5000;
+                        if(type === 'general') price = 800;
+                        if(type.includes('table')) price = 2000;
+
+                        activeCells.push({
+                            x: x, 
+                            y: y, 
+                            type: type, 
+                            price: price,
+                            label: `${type}-${x}-${y}`
+                        });
+
+                        // Calcular capacidad
+                        if(type.includes('table')) totalCapacity += 4;
+                        else if(type === 'general') totalCapacity += 1;
+                    }
+                });
+
+                mapData.layers.push({
+                    id: layerId,
+                    name: layerId === 0 ? "Pista" : "Balcón",
+                    cells: activeCells
+                });
+            });
+
+            mapData.capacity = totalCapacity;
+
+            // 4. ENVIAR A PHP (VERSIÓN DE DEBUGGING)
+            console.log("Enviando datos:", mapData);
+
+            fetch('save_venue.php', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(mapData)
+            })
+            .then(response => response.text()) // <--- IMPORTANTE: Leemos como texto primero
+            .then(text => {
+                try {
+                    const data = JSON.parse(text); // Intentamos convertir a JSON manualmente
+                    
+                    // Si llegamos aquí, es un JSON válido
+                    if(data.status === 'success') {
+                        createVisualCard(name, totalCapacity); 
+                        closeBuilder();
+                        
+                        const toast = document.getElementById('toast');
+                        if(toast) {
+                            toast.innerHTML = '<i class="fa-solid fa-database"></i> <span>¡Guardado! ID: ' + data.id + '</span>';
+                            toast.classList.remove('translate-y-20', 'opacity-0');
+                            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+                        } else {
+                            alert("Guardado exitoso");
+                        }
+                    } else {
+                        alert("PHP respondió con error: " + data.message);
+                    }
+
+                } catch (error) {
+                    // SI ENTRA AQUÍ, ES QUE PHP DEVOLVIÓ HTML (EL ERROR QUE TIENES AHORA)
+                    console.error("PHP Error Raw:", text);
+                    alert("¡ERROR DE PHP DETECTADO!\n\nEl servidor respondió con HTML en lugar de JSON.\nRevisa la consola (F12) o lee este mensaje:\n\n" + text.substring(0, 400) + "...");
+                }
+            })
+            .catch(error => {
+                console.error('Error de Red:', error);
+                alert("Error de conexión. Asegúrate de que XAMPP está corriendo.");
+            });
+        }
+    </script>
+
+
+
+    <script>
+
+
+
+        // --- LÓGICA DE RECINTOS (VENUES) ---
+        const venueModal = document.getElementById('create-venue-modal');
+        
+        function openVenueModal() { venueModal.classList.remove('hidden'); }
+        function closeVenueModal() { venueModal.classList.add('hidden'); }
+
+        // Agregar fila de zona
+        function addZoneInput() {
+            const tbody = document.getElementById('zones-list');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="py-2 pr-2"><input type="text" placeholder="Ej. VIP" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:border-purple-500 outline-none zone-name" required></td>
+                <td class="py-2 pr-2"><input type="number" placeholder="0" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 w-full text-white text-xs focus:border-purple-500 outline-none zone-cap" required></td>
+                <td class="py-2 text-center"><button type="button" onclick="removeZone(this)" class="text-zinc-600 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Eliminar fila de zona
+        function removeZone(btn) {
+            const row = btn.closest('tr');
+            // Asegurar que quede al menos una fila
+            if(document.querySelectorAll('#zones-list tr').length > 1) {
+                row.remove();
+            }
+        }
+
+        // Guardar y Generar Tarjeta
+        function saveVenue(e) {
+            e.preventDefault();
+            
+            // 1. Obtener Datos
+            const name = document.getElementById('venue-name').value;
+            const zoneNames = document.querySelectorAll('.zone-name');
+            const zoneCaps = document.querySelectorAll('.zone-cap');
+            
+            let totalCapacity = 0;
+            let zonesHTML = '';
+
+            // 2. Procesar Zonas
+            zoneNames.forEach((input, index) => {
+                const zName = input.value;
+                const zCap = parseInt(zoneCaps[index].value) || 0;
+                totalCapacity += zCap;
+                
+                // Crear las etiquetas pequeñas (tags) para la tarjeta
+                zonesHTML += `<span class="bg-zinc-800 px-2 py-1 rounded border border-zinc-700">${zName} (${zCap})</span>`;
+            });
+
+            // 3. Crear HTML de la Tarjeta
+            const grid = document.getElementById('venues-grid');
+            const newCard = document.createElement('div');
+            newCard.className = 'bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden group hover:border-green-500 transition relative fade-in';
+            newCard.innerHTML = `
+                <button onclick="deleteCard(this)" class="absolute top-2 right-2 text-zinc-500 hover:text-red-500 bg-black/50 hover:bg-black rounded p-1 transition"><i class="fa-solid fa-trash"></i></button>
+                <div class="h-40 bg-zinc-800 relative flex items-center justify-center">
+                    <i class="fa-solid fa-map-location-dot text-4xl text-gray-600"></i>
+                </div>
+                <div class="p-5">
+                    <h4 class="font-bold text-lg">${name}</h4>
+                    <p class="text-xs text-gray-500 mt-1">Capacidad: ${totalCapacity} Pax</p>
+                    <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                        ${zonesHTML}
+                    </div>
+                </div>
+            `;
+
+            // 4. Agregar al Grid
+            grid.appendChild(newCard);
+            
+            // 5. Cerrar y Limpiar
+            closeVenueModal();
+            e.target.reset(); // Limpia el formulario
+            
+            // Mostrar notificación de éxito
+            const toast = document.getElementById('toast');
+            toast.innerHTML = '<i class="fa-solid fa-check-circle"></i> <span>Recinto creado exitosamente</span>';
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // Función auxiliar para borrar tarjetas (solo visual)
+        function deleteCard(btn) {
+            if(confirm('¿Eliminar este recinto?')) {
+                const card = btn.closest('.group');
+                card.remove();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // --- NAVEGACIÓN SPA ---
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            ['dashboard', 'events', 'venues', 'sales'].forEach(id => {
+                document.getElementById('view-' + id)?.classList.add('hidden');
+            });
+            // Mostrar la seleccionada
+            document.getElementById('view-' + sectionId).classList.remove('hidden');
+            
+            // Actualizar título header
+            const titles = {
+                'dashboard': 'Resumen General',
+                'events': 'Gestión de Eventos',
+                'venues': 'Modelos de Recintos',
+                'sales': 'Reporte de Ventas'
+            };
+            document.getElementById('page-title').innerText = titles[sectionId];
+
+            // Actualizar clase activa sidebar
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active', 'text-white'));
+            document.getElementById('nav-' + sectionId).classList.add('active');
+            document.getElementById('nav-' + sectionId).classList.remove('text-gray-400');
+        }
+
+        // --- MODAL CREAR EVENTO ---
+        const modal = document.getElementById('create-event-modal');
+        
+        function openCreateModal() { modal.classList.remove('hidden'); }
+        function closeCreateModal() { modal.classList.add('hidden'); }
+
+        // --- LÓGICA DE MODELOS DE RECINTO ---
+        // Simula que al elegir un mapa, el sistema sabe qué zonas existen
+        function updateTicketConfig() {
+            const venue = document.getElementById('venue-select').value;
+            const container = document.getElementById('ticket-config-area');
+            const tbody = document.getElementById('ticket-rows');
+            
+            if (!venue) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            tbody.innerHTML = ''; // Limpiar
+
+            let zones = [];
+
+            // Definir zonas según el modelo elegido
+            if (venue === 'club') {
+                zones = [
+                    { name: 'VIP Booth (Mesas 1-10)', cap: 10, defaultPrice: 5000 },
+                    { name: 'Premium Sofa (Pista)', cap: 20, defaultPrice: 3000 },
+                    { name: 'General (De pie)', cap: 300, defaultPrice: 800 }
+                ];
+            } else if (venue === 'terraza') {
+                zones = [
+                    { name: 'Mesa Alta', cap: 30, defaultPrice: 1500 },
+                    { name: 'Barra Libre', cap: 100, defaultPrice: 1200 }
+                ];
+            } else {
+                zones = [
+                    { name: 'General', cap: 500, defaultPrice: 500 }
+                ];
+            }
+
+            // Generar filas de input
+            zones.forEach(zone => {
+                const row = `
+                    <tr>
+                        <td class="py-3 font-medium">${zone.name}</td>
+                        <td class="py-3 text-gray-400">${zone.cap} Disp.</td>
+                        <td class="py-3">
+                            <input type="number" value="${zone.defaultPrice}" class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 w-24 text-white focus:border-purple-500 outline-none">
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // --- GUARDAR EVENTO (SIMULADO) ---
+        function saveEvent(e) {
+            e.preventDefault();
+            closeCreateModal();
+            
+            // Mostrar Toast
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- GRÁFICA INICIAL (Chart.js) ---
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+                datasets: [{
+                    label: 'Ventas ($)',
+                    data: [1200, 1900, 3000, 5000, 12000, 15000, 8000],
+                    backgroundColor: '#a855f7',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#27272a' }, ticks: { color: '#71717a' } },
+                    x: { grid: { display: false }, ticks: { color: '#71717a' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

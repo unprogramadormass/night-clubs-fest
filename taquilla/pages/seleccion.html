@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de Mesa - UrbanFest Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+
+        /* Estilos personalizados para el mapa */
+        .club-map {
+            display: grid;
+            grid-template-columns: 80px 1fr 60px; /* DJ - Pista - Barra */
+            gap: 20px;
+            min-width: 800px; /* Ancho mínimo para que no se deforme en móvil */
+        }
+
+        /* Objetos del mapa */
+        .dj-booth {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            border-radius: 50% 0 0 50%; /* Forma curva */
+        }
+        
+        .bar-area {
+            writing-mode: vertical-rl;
+            border-radius: 0 20px 20px 0;
+        }
+
+        /* Asientos / Mesas */
+        .seat {
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+        .seat:hover { transform: scale(1.1); z-index: 10; filter: brightness(1.2); }
+        .seat.selected { border: 2px solid white; box-shadow: 0 0 15px white; }
+        .seat.sold { background-color: #374151 !important; color: #9ca3af; cursor: not-allowed; }
+
+        /* Formas específicas basadas en tu imagen */
+        .shape-u { border-radius: 0 0 20px 20px; height: 50px; } /* Sofás en U */
+        .shape-l-top { border-radius: 20px 20px 0 0; }
+        .shape-round { border-radius: 50%; width: 60px; height: 60px; } /* Mesas redondas centrales */
+        .shape-rect { border-radius: 8px; }
+
+        /* Colores por zona */
+        .bg-vip-pink { background-color: #d946ef; } /* Fucsia */
+        .bg-premium-blue { background-color: #0ea5e9; } /* Azul */
+        .bg-gold-center { background-color: #eab308; } /* Dorado */
+        
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen pb-20">
+
+    <header class="fixed w-full top-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+        <div class="container mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="/img/UrbanFest-removebg-preview.png" alt="Logo" class="h-10 w-10 object-contain">
+                <span class="text-xl font-bold tracking-tighter">UrbanFest<span class="text-gray-500"> Club</span></span>
+            </div>
+            <a href="index.html" class="text-gray-400 hover:text-white transition text-sm font-bold uppercase">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Volver
+            </a>
+        </div>
+    </header>
+
+    <main class="pt-24 container mx-auto px-4 lg:px-8 flex flex-col lg:flex-row gap-8">
+        
+        <section class="lg:w-2/3 fade-in">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                <h2 class="text-2xl font-bold mb-2">Selecciona tu Lugar</h2>
+                <p class="text-gray-400 text-sm mb-6">Haz clic en las mesas para añadirlas a tu carrito.</p>
+
+                <div class="flex flex-wrap gap-4 mb-6 text-xs uppercase font-bold tracking-wider justify-center bg-black/30 p-3 rounded-lg">
+                    <div class="flex items-center"><div class="w-4 h-4 bg-vip-pink rounded mr-2"></div> VIP Booth ($5,000)</div>
+                    <div class="flex items-center"><div class="w-4 h-4 bg-premium-blue rounded mr-2"></div> Premium ($3,000)</div>
+                    <div class="flex items-center"><div class="w-4 h-4 bg-gold-center rounded mr-2"></div> Central ($2,000)</div>
+                    <div class="flex items-center"><div class="w-4 h-4 bg-gray-700 rounded mr-2"></div> Ocupado</div>
+                </div>
+
+                <div class="overflow-x-auto pb-4 flex justify-center">
+                    <div class="club-map bg-black p-8 rounded-xl border border-zinc-800 relative">
+                        
+                        <div class="dj-booth bg-zinc-800 border-r-4 border-purple-500 flex items-center justify-center font-bold tracking-[1em] text-gray-500 py-10">
+                            DJ BOOTH
+                        </div>
+
+                        <div class="flex flex-col justify-between gap-6">
+                            
+                            <div class="flex justify-between items-end gap-4">
+                                <div class="flex gap-2">
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink" data-id="9" data-price="5000" data-type="VIP Booth" onclick="toggleSeat(this)">9</div>
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink" data-id="10" data-price="5000" data-type="VIP Booth" onclick="toggleSeat(this)">10</div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="seat shape-rect w-20 h-10 bg-premium-blue" data-id="23" data-price="3000" data-type="Premium Sofa" onclick="toggleSeat(this)">23</div>
+                                    <div class="seat shape-rect w-20 h-10 bg-premium-blue" data-id="22" data-price="3000" data-type="Premium Sofa" onclick="toggleSeat(this)">22</div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink sold">1</div>
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink" data-id="2" data-price="5000" data-type="VIP Booth" onclick="toggleSeat(this)">2</div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center items-center gap-8 py-4">
+                                <div class="seat shape-round bg-gold-center flex items-center justify-center text-black" data-id="33" data-price="2000" data-type="Mesa Central" onclick="toggleSeat(this)">33</div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="seat shape-rect w-10 h-10 bg-zinc-700 border border-gold-center" data-id="32" data-price="2000" data-type="Mesa Alta" onclick="toggleSeat(this)">32</div>
+                                    <div class="seat shape-rect w-10 h-10 bg-zinc-700 border border-gold-center" data-id="31" data-price="2000" data-type="Mesa Alta" onclick="toggleSeat(this)">31</div>
+                                    <div class="seat shape-rect w-10 h-10 bg-zinc-700 border border-gold-center" data-id="42" data-price="2000" data-type="Mesa Alta" onclick="toggleSeat(this)">42</div>
+                                    <div class="seat shape-rect w-10 h-10 bg-zinc-700 border border-gold-center" data-id="41" data-price="2000" data-type="Mesa Alta" onclick="toggleSeat(this)">41</div>
+                                </div>
+
+                                <div class="seat shape-round bg-gold-center flex items-center justify-center text-black" data-id="43" data-price="2000" data-type="Mesa Central" onclick="toggleSeat(this)">43</div>
+                            </div>
+
+                            <div class="flex justify-between items-start gap-4">
+                                <div class="flex gap-2">
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink" data-id="65" data-price="5000" data-type="VIP Booth" onclick="toggleSeat(this)">65</div>
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink" data-id="64" data-price="5000" data-type="VIP Booth" onclick="toggleSeat(this)">64</div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="seat shape-rect w-20 h-10 bg-premium-blue sold">53</div>
+                                    <div class="seat shape-rect w-20 h-10 bg-premium-blue" data-id="52" data-price="3000" data-type="Premium Sofa" onclick="toggleSeat(this)">52</div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink" data-id="61" data-price="5000" data-type="VIP Booth" onclick="toggleSeat(this)">61</div>
+                                    <div class="seat shape-rect w-12 h-12 bg-vip-pink" data-id="60" data-price="5000" data-type="VIP Booth" onclick="toggleSeat(this)">60</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="bar-area bg-zinc-800 border-l border-zinc-700 flex items-center justify-center font-bold tracking-widest text-gray-500">
+                            BARRA PRINCIPAL
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="lg:w-1/3 fade-in" style="animation-delay: 0.2s;">
+            <div class="sticky top-24 space-y-4">
+                
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-1">LOP DELLER</h3>
+                    <p class="text-purple-400 text-sm font-bold mb-4">20 OCT • 21:00 HRS</p>
+                    <div class="flex items-center text-sm text-gray-400">
+                        <i class="fa-solid fa-location-dot mr-2"></i> UrbanFest Club
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+                    <h3 class="text-lg font-bold mb-4 border-b border-gray-700 pb-2">Tu Selección</h3>
+                    
+                    <div id="cart-items" class="space-y-3 mb-6 min-h-[50px]">
+                        <p class="text-gray-500 text-sm italic text-center py-4">Selecciona una mesa del mapa</p>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xl font-bold mb-6 pt-4 border-t border-gray-700">
+                        <span>Total:</span>
+                        <span id="total-price" class="text-purple-400">$0 MXN</span>
+                    </div>
+
+                    <button id="btn-checkout" onclick="showCheckout()" class="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition opacity-50 cursor-not-allowed" disabled>
+                        Continuar al Pago
+                    </button>
+                </div>
+
+                <div id="payment-form" class="hidden bg-zinc-900 border border-zinc-800 rounded-xl p-6 fade-in">
+                    <h3 class="text-lg font-bold mb-4">Datos de Pago</h3>
+                    <form onsubmit="processPayment(event)" class="space-y-3">
+                        <div class="bg-gradient-to-r from-purple-900 to-blue-900 p-4 rounded-lg mb-4 flex justify-between items-center">
+                            <span class="font-mono text-sm">**** **** **** 4242</span>
+                            <i class="fa-brands fa-cc-visa text-2xl"></i>
+                        </div>
+                        <input type="text" placeholder="Nombre en la tarjeta" class="w-full bg-black border border-gray-700 rounded p-3 text-sm focus:border-purple-500 outline-none transition" required>
+                        <div class="flex gap-2">
+                            <input type="text" placeholder="MM/AA" class="w-1/2 bg-black border border-gray-700 rounded p-3 text-sm outline-none" required>
+                            <input type="text" placeholder="CVC" class="w-1/2 bg-black border border-gray-700 rounded p-3 text-sm outline-none" required>
+                        </div>
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg transition mt-2">
+                            Pagar Ahora <i class="fa-solid fa-lock ml-1 text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </aside>
+
+    </main>
+
+    <div id="success-modal" class="fixed inset-0 z-[60] hidden bg-black/80 backdrop-blur flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-2xl p-8 max-w-sm text-center">
+            <div class="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">¡Pago Exitoso!</h2>
+            <p class="text-gray-400 mb-6">Tus boletos han sido enviados a tu correo electrónico.</p>
+            <a href="index.html" class="block w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200">Volver al Inicio</a>
+        </div>
+    </div>
+
+    <script>
+        let selectedSeats = [];
+        const cartContainer = document.getElementById('cart-items');
+        const totalPriceEl = document.getElementById('total-price');
+        const checkoutBtn = document.getElementById('btn-checkout');
+        const paymentForm = document.getElementById('payment-form');
+        const successModal = document.getElementById('success-modal');
+
+        function toggleSeat(element) {
+            // Si está vendido, no hacer nada
+            if (element.classList.contains('sold')) return;
+
+            const id = element.dataset.id;
+            const price = parseInt(element.dataset.price);
+            const type = element.dataset.type;
+
+            if (element.classList.contains('selected')) {
+                // Deseleccionar
+                element.classList.remove('selected');
+                selectedSeats = selectedSeats.filter(seat => seat.id !== id);
+            } else {
+                // Seleccionar
+                element.classList.add('selected');
+                selectedSeats.push({ id, price, type });
+            }
+
+            updateCart();
+        }
+
+        function updateCart() {
+            cartContainer.innerHTML = '';
+            let total = 0;
+
+            if (selectedSeats.length === 0) {
+                cartContainer.innerHTML = '<p class="text-gray-500 text-sm italic text-center py-4">Selecciona una mesa del mapa</p>';
+                checkoutBtn.disabled = true;
+                checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                checkoutBtn.classList.remove('hover:bg-gray-200');
+            } else {
+                selectedSeats.forEach(seat => {
+                    total += seat.price;
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center text-sm bg-zinc-800 p-2 rounded animate-[fadeIn_0.2s]';
+                    item.innerHTML = `
+                        <div>
+                            <span class="font-bold text-white">Mesa ${seat.id}</span>
+                            <span class="text-xs text-gray-400 block">${seat.type}</span>
+                        </div>
+                        <span class="font-bold">$${seat.price.toLocaleString()}</span>
+                    `;
+                    cartContainer.appendChild(item);
+                });
+
+                checkoutBtn.disabled = false;
+                checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                checkoutBtn.classList.add('hover:bg-gray-200');
+            }
+
+            totalPriceEl.innerText = `$${total.toLocaleString()} MXN`;
+        }
+
+        function showCheckout() {
+            // Ocultar botón y mostrar formulario con animación
+            checkoutBtn.classList.add('hidden');
+            paymentForm.classList.remove('hidden');
+            // Scroll suave hacia el formulario en móviles
+            paymentForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function processPayment(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Procesando...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                successModal.classList.remove('hidden');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

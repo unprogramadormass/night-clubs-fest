@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel - UrbanFest Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #ffffff; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Estilo Wallet */
+        .wallet-ticket {
+            background: linear-gradient(135deg, #1f1f22 0%, #09090b 100%);
+            border: 1px solid #3f3f46;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .wallet-ticket::before, .wallet-ticket::after {
+            content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 20px; background-color: #000000; border-radius: 50%; z-index: 10;
+        }
+        .wallet-ticket::before { top: -10px; }
+        .wallet-ticket::after { bottom: -10px; }
+        .wallet-ticket:hover { transform: translateY(-3px); border-color: #a855f7; box-shadow: 0 10px 20px -5px rgba(168, 85, 247, 0.2); }
+
+        /* Estilo Modal */
+        .ticket-cut-line { border-top: 2px dashed #3f3f46; position: relative; margin: 20px 0; }
+        .ticket-cut-line::before, .ticket-cut-line::after {
+            content: ''; position: absolute; top: -10px; width: 20px; height: 20px; background-color: #18181b; border-radius: 50%;
+        }
+        .ticket-cut-line::before { left: -30px; }
+        .ticket-cut-line::after { right: -30px; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen relative">
+
+    <header class="fixed w-full top-0 z-50 bg-black/90 backdrop-blur-sm border-b border-gray-800">
+        <div class="container mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 cursor-pointer">
+                <img src="/img/UrbanFest-removebg-preview.png" alt="Logo" class="h-10 w-10 object-contain">
+                <span class="text-xl font-bold tracking-tighter hidden md:block">UrbanFest<span class="text-gray-500"> Club</span></span>
+            </a>
+
+            <div class="flex items-center gap-6">
+                <div class="relative">
+                    <button onclick="toggleNotifications()" class="relative text-gray-400 hover:text-white transition">
+                        <i class="fa-solid fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-600 text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold">2</span>
+                    </button>
+                    <div id="notif-dropdown" class="hidden absolute right-0 mt-4 w-80 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden z-50 fade-in">
+                        <div class="p-3 border-b border-zinc-800 font-bold text-sm">Notificaciones</div>
+                        <div class="max-h-64 overflow-y-auto">
+                            <div class="p-3 hover:bg-zinc-800 cursor-pointer border-b border-zinc-800/50">
+                                <p class="text-xs text-purple-400 font-bold mb-1">Recordatorio</p>
+                                <p class="text-sm">Tu evento LOP DELLER es mañana a las 21:00.</p>
+                            </div>
+                            <div class="p-3 hover:bg-zinc-800 cursor-pointer">
+                                <p class="text-xs text-green-400 font-bold mb-1">Pago Exitoso</p>
+                                <p class="text-sm">Has comprado 2 boletos para CCÑA.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center gap-4 text-sm font-medium">
+                    <span class="text-gray-400">Hola, <span class="text-white font-bold">Juan Pérez</span></span>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center font-bold">JP</div>
+                </div>
+
+                <button onclick="toggleMobileMenu()" class="md:hidden text-white text-2xl focus:outline-none">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-zinc-900 transform translate-x-full transition-transform duration-300 md:hidden flex flex-col pt-24 px-6">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-gray-400 hover:text-white text-2xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center font-bold text-xl">JP</div>
+            <div>
+                <p class="font-bold text-lg">Juan Pérez</p>
+                <p class="text-sm text-gray-400">juan@email.com</p>
+            </div>
+        </div>
+        <nav class="space-y-4 text-lg">
+            <a href="viewtickets.html" class="block p-3 bg-zinc-800 rounded-lg"><i class="fa-solid fa-ticket mr-3 text-purple-500"></i> Mis Boletos</a>
+            <a href="#" class="block p-3 hover:bg-zinc-800 rounded-lg"><i class="fa-solid fa-user mr-3 text-gray-400"></i> Mi Perfil</a>
+            <a href="#" class="block p-3 hover:bg-zinc-800 rounded-lg"><i class="fa-solid fa-gear mr-3 text-gray-400"></i> Configuración</a>
+            <a href="index.html" class="block p-3 hover:bg-red-900/20 text-red-400 rounded-lg mt-8"><i class="fa-solid fa-power-off mr-3"></i> Cerrar Sesión</a>
+        </nav>
+    </div>
+
+    <main class="container mx-auto px-6 pt-28 pb-20">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <div class="lg:col-span-3 fade-in">
+                
+               <div class="mb-8 border-b border-gray-800 pb-4 flex justify-between items-end">
+                    <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tighter">Eventos</h1>
+                    <p class="text-purple-500 font-bold uppercase text-sm md:text-base tracking-widest bg-purple-500/10 px-3 py-1 rounded-lg">Próximos Eventos</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+                    <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                            <img src="/img/concert1.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">20 OCT • 21:00 HRS</p>
+                            <h3 class="text-xl font-black text-white mb-1 uppercase">LOP DELLER</h3>
+                                                <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>
+                            <button onclick="location.href='seleccion.html'" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                        </div>
+                    </div>
+
+                    <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                            <img src="/img/concert2.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">15 NOV • 20:30 HRS</p>
+                            <h3 class="text-xl font-black text-white mb-1 uppercase">CCÑA</h3>
+                                                <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>
+                            <button onclick="location.href='seleccion.html'" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                        </div>
+                    </div>
+
+                    <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                            <img src="/img/concert4.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">05 DIC • 19:00 HRS</p>
+                            <h3 class="text-xl font-black text-white mb-1 uppercase">Yardenitt</h3>
+                                                <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>
+                            <button onclick="location.href='seleccion.html'" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                        </div>
+                    </div>
+
+                    <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                            <img src="/img/concert5.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">10 DIC • 21:00 HRS</p>
+                            <h3 class="text-xl font-black text-white mb-1 uppercase">Mizil</h3>
+                                                <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>
+                            <button onclick="location.href='seleccion.html'" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                        </div>
+                    </div>
+
+                    <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                            <img src="/img/concert6.jpg" class="event-img w-full h-full object-cover transition duration-500">
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">12 ENE • 20:00 HRS</p>
+                            <h3 class="text-xl font-black text-white mb-1 uppercase">Don alberici</h3>
+                                                <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>
+                            <button onclick="location.href='seleccion.html'" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                        </div>
+                    </div>
+
+                    <div class="event-card group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gray-600 transition duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <span class="absolute top-4 left-4 bg-white text-black text-xs font-bold px-3 py-1 rounded uppercase z-10">Música</span>
+                            <img src="/img/concert7.jpeg" class="event-img w-full h-full object-cover transition duration-500">
+                        </div>
+                        <div class="p-5">
+                            <p class="text-gray-500 text-xs font-bold mb-1 uppercase tracking-wider">14 FEB • 18:00 HRS</p>
+                            <h3 class="text-xl font-black text-white mb-1 uppercase">Sound Control</h3>
+                                                <p class="text-gray-400 text-sm mb-6"><i class="fa-solid fa-location-dot mr-1 text-white"></i> Blvd. Gral. Marcelino García Barragán 1671, Olímpica, 44430 Guadalajara, Jal.</p>
+                            <button onclick="location.href='seleccion.html'" class="block w-full text-center bg-white text-black font-bold py-2 rounded hover:bg-gray-200 transition uppercase text-xs tracking-widest">Comprar</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-center mt-12 gap-2">
+                    <button class="w-10 h-10 rounded-lg bg-zinc-800 text-gray-400 hover:bg-white hover:text-black transition flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="w-10 h-10 rounded-lg bg-white text-black font-bold flex items-center justify-center">1</button>
+                    <button class="w-10 h-10 rounded-lg bg-zinc-800 text-gray-400 hover:bg-white hover:text-black transition flex items-center justify-center">2</button>
+                    <button class="w-10 h-10 rounded-lg bg-zinc-800 text-gray-400 hover:bg-white hover:text-black transition flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1 fade-in space-y-8 hidden lg:block" style="animation-delay: 0.2s;">
+                
+                <div>
+                    <div class="flex justify-between items-end mb-4">
+                        <h2 class="text-xl font-bold uppercase tracking-tighter">Mis Boletos</h2>
+                        <a href="viewtickets.html" class="text-xs text-purple-400 hover:text-white font-bold transition uppercase tracking-wider">Ver Todos <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                    </div>
+
+                    <div onclick="openTicketModal('LOP DELLER', '20 OCT • 21:00', 'VIP • Mesa 10', 'Ticket-12345', '$5,000')" class="wallet-ticket rounded-2xl p-5 mb-4 group cursor-pointer hover:border-purple-500">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="font-black text-lg uppercase leading-none mb-1 text-purple-400">LOP DELLER</h4>
+                                <p class="text-xs text-gray-400 font-bold">20 OCT • 21:00</p>
+                            </div>
+                            <i class="fa-solid fa-qrcode text-zinc-500 text-xl group-hover:text-white transition"></i>
+                        </div>
+                        <div class="border-t-2 border-dashed border-zinc-700 my-4 relative"></div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-400"><p>Mesa VIP</p><p class="text-white font-bold text-sm">A-12</p></div>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=Ticket1" class="w-12 h-12 bg-white p-1 rounded opacity-70 group-hover:opacity-100 transition">
+                        </div>
+                    </div>
+
+                    <div onclick="openTicketModal('CCÑA', '15 NOV • 20:30', 'General Pista', 'Ticket-67890', '$1,200')" class="wallet-ticket rounded-2xl p-5 mb-4 group cursor-pointer hover:border-blue-500">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="font-black text-lg uppercase leading-none mb-1 text-blue-400">CCÑA</h4>
+                                <p class="text-xs text-gray-400 font-bold">15 NOV • 20:30</p>
+                            </div>
+                            <i class="fa-solid fa-qrcode text-zinc-500 text-xl group-hover:text-white transition"></i>
+                        </div>
+                        <div class="border-t-2 border-dashed border-zinc-700 my-4 relative"></div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-gray-400"><p>General</p><p class="text-white font-bold text-sm">Pista</p></div>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=Ticket2" class="w-12 h-12 bg-white p-1 rounded opacity-70 group-hover:opacity-100 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 hidden lg:block">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 px-2">Configuración</h3>
+                    <ul class="space-y-1">
+                        <li><button class="w-full flex items-center p-3 rounded-lg hover:bg-zinc-800 text-gray-300 hover:text-white transition group text-left"><span class="w-8 flex justify-center"><i class="fa-regular fa-user"></i></span><span class="text-sm font-medium">Mi Perfil</span></button></li>
+                        <li><button class="w-full flex items-center p-3 rounded-lg hover:bg-zinc-800 text-gray-300 hover:text-white transition group text-left"><span class="w-8 flex justify-center"><i class="fa-solid fa-gear"></i></span><span class="text-sm font-medium">Ajustes</span></button></li>
+                        <li><a href="index.html" class="w-full flex items-center p-3 rounded-lg hover:bg-red-900/20 text-red-400 transition group text-left"><span class="w-8 flex justify-center"><i class="fa-solid fa-power-off"></i></span><span class="text-sm font-medium">Salir</span></a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="ticket-modal" class="fixed inset-0 z-[80] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity" onclick="closeTicketModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <div class="relative transform overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-700 text-left shadow-2xl transition-all w-full max-w-sm fade-in">
+                
+                <button onclick="closeTicketModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+                
+                <div class="p-6 text-center bg-[#18181b]">
+                    <h3 id="modal-event-name" class="text-2xl font-black uppercase mb-1 text-white">EVENTO</h3>
+                    <p id="modal-event-time" class="text-gray-400 text-sm font-bold uppercase tracking-wider mb-6">FECHA</p>
+                    
+                    <div class="bg-white p-4 rounded-xl inline-block mb-4 shadow-xl">
+                        <img id="modal-qr" src="" class="w-40 h-40 mix-blend-multiply">
+                    </div>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest">Escanea en la entrada</p>
+                </div>
+
+                <div class="ticket-cut-line"></div>
+
+                <div class="px-6 pb-6">
+                    <div class="flex justify-between mb-4 text-sm">
+                        <div class="text-left">
+                            <p class="text-gray-500 text-xs uppercase">Asiento</p>
+                            <p id="modal-seat" class="font-bold text-white text-lg">Zona</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-500 text-xs uppercase">Costo</p>
+                            <p id="modal-price" class="font-bold text-purple-400 text-lg">$0</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-file-pdf"></i> Descargar PDF
+                        </button>
+                        <button class="w-full bg-black border border-zinc-700 hover:bg-zinc-800 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-apple text-xl"></i> Añadir a Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- MOBILE MENU ---
+        const mobileMenu = document.getElementById('mobile-menu');
+        function toggleMobileMenu() {
+            if (mobileMenu.classList.contains('translate-x-full')) {
+                mobileMenu.classList.remove('translate-x-full');
+            } else {
+                mobileMenu.classList.add('translate-x-full');
+            }
+        }
+
+        // --- NOTIFICATIONS ---
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notif-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // --- TICKET MODAL ---
+        const ticketModal = document.getElementById('ticket-modal');
+        const modalQr = document.getElementById('modal-qr');
+        const modalEvent = document.getElementById('modal-event-name');
+        const modalTime = document.getElementById('modal-event-time');
+        const modalSeat = document.getElementById('modal-seat');
+        const modalPrice = document.getElementById('modal-price');
+
+        function openTicketModal(event, time, seat, ticketId, price) {
+            modalEvent.innerText = event;
+            modalTime.innerText = time;
+            modalSeat.innerText = seat;
+            modalPrice.innerText = price;
+            modalQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticketId}`;
+            ticketModal.classList.remove('hidden');
+        }
+
+        function closeTicketModal() {
+            ticketModal.classList.add('hidden');
+        }
+
+        // Close dropdowns on click outside
+        window.onclick = function(event) {
+            if (!event.target.closest('button')) {
+                document.getElementById('notif-dropdown').classList.add('hidden');
+            }
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                closeTicketModal();
+                mobileMenu.classList.add('translate-x-full');
+            }
+        });
+    </script>
+</body>
+</html>
